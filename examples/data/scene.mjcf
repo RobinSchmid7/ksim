@@ -80,6 +80,43 @@
   <worldbody>
     <geom name="floor" size="0 0 .05" type="plane" material="grid" condim="1"/>
     <light name="spotlight" mode="targetbodycom" target="torso" diffuse=".8 .8 .8" specular="0.3 0.3 0.3" pos="0 -6 4" cutoff="30"/>
+    
+    <!-- OBSTACLE COURSE -->
+    <body name="obstacle_course" pos="0 0 0">
+      <!-- Starting area boxes to navigate around -->
+      <geom name="box1" type="box" size="0.3 0.3 0.4" pos="3 0.8 0.4" rgba="0.8 0.2 0.2 1"/>
+      <geom name="box2" type="box" size="0.2 0.4 0.3" pos="4 -0.6 0.3" rgba="0.2 0.8 0.2 1"/>
+      
+      <!-- Stepping stones -->
+      <geom name="stone1" type="cylinder" size="0.4 0.08" pos="6 0 0.08" rgba="0.6 0.6 0.6 1"/>
+      <geom name="stone2" type="cylinder" size="0.35 0.08" pos="7.5 0.7 0.08" rgba="0.6 0.6 0.6 1"/>
+      <geom name="stone3" type="cylinder" size="0.4 0.08" pos="9 -0.4 0.08" rgba="0.6 0.6 0.6 1"/>
+      <geom name="stone4" type="cylinder" size="0.3 0.08" pos="10.5 0.2 0.08" rgba="0.6 0.6 0.6 1"/>
+      
+      <!-- Raised platform section -->
+      <geom name="platform1" type="box" size="1.2 1.2 0.15" pos="13 0 0.15" rgba="0.4 0.4 0.8 1"/>
+      <geom name="ramp_up" type="box" size="0.8 1 0.08" pos="11.7 0 0.08" euler="0 0.2 0" rgba="0.5 0.3 0.1 1"/>
+      <geom name="ramp_down" type="box" size="0.8 1 0.08" pos="14.3 0 0.08" euler="0 -0.2 0" rgba="0.5 0.3 0.1 1"/>
+      
+      <!-- Low barriers to step over -->
+      <geom name="barrier1" type="box" size="0.05 1.5 0.15" pos="16 0 0.15" rgba="0.9 0.9 0.1 1"/>
+      <geom name="barrier2" type="box" size="0.05 1.2 0.12" pos="17.5 0 0.12" rgba="0.9 0.9 0.1 1"/>
+      <geom name="barrier3" type="box" size="0.05 1.0 0.18" pos="19 0 0.18" rgba="0.9 0.9 0.1 1"/>
+      
+      <!-- Narrow passage -->
+      <geom name="wall_left" type="box" size="0.1 0.4 0.5" pos="21 0.6 0.5" rgba="0.7 0.5 0.3 1"/>
+      <geom name="wall_right" type="box" size="0.1 0.4 0.5" pos="21 -0.6 0.5" rgba="0.7 0.5 0.3 1"/>
+      
+      <!-- Final challenge - scattered cylinders -->
+      <geom name="cyl1" type="cylinder" size="0.15 0.6" pos="23 0.5 0.6" rgba="0.6 0.2 0.8 1"/>
+      <geom name="cyl2" type="cylinder" size="0.12 0.4" pos="24 -0.3 0.4" rgba="0.6 0.2 0.8 1"/>
+      <geom name="cyl3" type="cylinder" size="0.18 0.5" pos="25 0.1 0.5" rgba="0.6 0.2 0.8 1"/>
+      
+      <!-- End zone elevated goal -->
+      <geom name="goal_platform" type="box" size="1.5 1.5 0.2" pos="27 0 0.2" rgba="0.2 0.8 0.8 1"/>
+      <geom name="goal_ramp" type="box" size="1 1.2 0.1" pos="25.5 0 0.1" euler="0 0.15 0" rgba="0.1 0.6 0.6 1"/>
+    </body>
+    
     <body name="torso" pos="0 0 1.4" childclass="body">
       <light name="top" pos="0 0 2" mode="trackcom"/>
       <camera name="back" pos="-3 0 1" xyaxes="0 -1 0 1 0 2" mode="trackcom"/>
@@ -165,6 +202,46 @@
     <exclude body1="waist_lower" body2="thigh_left"/>
     <pair geom1="foot_left" geom2="floor"/>
     <pair geom1="foot_right" geom2="floor"/>
+    
+    <!-- Obstacle course contacts -->
+    <pair geom1="foot_left" geom2="box1"/>
+    <pair geom1="foot_right" geom2="box1"/>
+    <pair geom1="foot_left" geom2="box2"/>
+    <pair geom1="foot_right" geom2="box2"/>
+    <pair geom1="foot_left" geom2="stone1"/>
+    <pair geom1="foot_right" geom2="stone1"/>
+    <pair geom1="foot_left" geom2="stone2"/>
+    <pair geom1="foot_right" geom2="stone2"/>
+    <pair geom1="foot_left" geom2="stone3"/>
+    <pair geom1="foot_right" geom2="stone3"/>
+    <pair geom1="foot_left" geom2="stone4"/>
+    <pair geom1="foot_right" geom2="stone4"/>
+    <pair geom1="foot_left" geom2="platform1"/>
+    <pair geom1="foot_right" geom2="platform1"/>
+    <pair geom1="foot_left" geom2="ramp_up"/>
+    <pair geom1="foot_right" geom2="ramp_up"/>
+    <pair geom1="foot_left" geom2="ramp_down"/>
+    <pair geom1="foot_right" geom2="ramp_down"/>
+    <pair geom1="foot_left" geom2="barrier1"/>
+    <pair geom1="foot_right" geom2="barrier1"/>
+    <pair geom1="foot_left" geom2="barrier2"/>
+    <pair geom1="foot_right" geom2="barrier2"/>
+    <pair geom1="foot_left" geom2="barrier3"/>
+    <pair geom1="foot_right" geom2="barrier3"/>
+    <pair geom1="foot_left" geom2="wall_left"/>
+    <pair geom1="foot_right" geom2="wall_left"/>
+    <pair geom1="foot_left" geom2="wall_right"/>
+    <pair geom1="foot_right" geom2="wall_right"/>
+    <pair geom1="foot_left" geom2="cyl1"/>
+    <pair geom1="foot_right" geom2="cyl1"/>
+    <pair geom1="foot_left" geom2="cyl2"/>
+    <pair geom1="foot_right" geom2="cyl2"/>
+    <pair geom1="foot_left" geom2="cyl3"/>
+    <pair geom1="foot_right" geom2="cyl3"/>
+    <pair geom1="foot_left" geom2="goal_platform"/>
+    <pair geom1="foot_right" geom2="goal_platform"/>
+    <pair geom1="foot_left" geom2="goal_ramp"/>
+    <pair geom1="foot_right" geom2="goal_ramp"/>
   </contact>
 
   <actuator>
