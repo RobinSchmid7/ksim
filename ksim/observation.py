@@ -14,6 +14,8 @@ __all__ = [
     "DelayedJointVelocityObservation",
     "CenterOfMassInertiaObservation",
     "CenterOfMassVelocityObservation",
+    "RobotCenterOfMassInertiaObservation",
+    "RobotCenterOfMassVelocityObservation",
     "ActuatorForceObservation",
     "SensorObservation",
     "BaseLinearAccelerationObservation",
@@ -275,6 +277,122 @@ class CenterOfMassVelocityObservation(Observation):
     def observe(self, state: ObservationInput, curriculum_level: Array, rng: PRNGKeyArray) -> Array:
         # Skip the first entry (world body) and flatten
         cvel = state.physics_state.data.cvel[1:].ravel()  # Shape will be (nbody-1, 6)
+        return cvel
+
+
+@attrs.define(frozen=True, kw_only=True)
+class RobotCenterOfMassInertiaObservation(Observation):
+    """Robot-centric center of mass inertia observation that only includes robot bodies."""
+    
+    robot_body_names: tuple[str, ...] = attrs.field(
+        default=(
+            "torso", "head", "waist_lower", "pelvis",
+            "thigh_right", "shin_right", "foot_right",
+            "thigh_left", "shin_left", "foot_left", 
+            "upper_arm_right", "lower_arm_right", "hand_right",
+            "upper_arm_left", "lower_arm_left", "hand_left"
+        )
+    )
+    robot_body_indices: tuple[int, ...] = attrs.field(default=())
+    
+    @classmethod
+    def create(
+        cls,
+        *,
+        physics_model: PhysicsModel,
+        robot_body_names: tuple[str, ...] | None = None,
+        noise: float = 0.0,
+        noise_type: NoiseType = "gaussian",
+    ) -> Self:
+        """Create a robot-centric center of mass inertia observation."""
+        if robot_body_names is None:
+            robot_body_names = (
+                "torso", "head", "waist_lower", "pelvis",
+                "thigh_right", "shin_right", "foot_right",
+                "thigh_left", "shin_left", "foot_left", 
+                "upper_arm_right", "lower_arm_right", "hand_right",
+                "upper_arm_left", "lower_arm_left", "hand_left"
+            )
+        
+        # Get body indices for the robot bodies
+        robot_body_indices = []
+        for body_name in robot_body_names:
+            try:
+                body_idx = get_body_data_idx_from_name(physics_model, body_name)
+                robot_body_indices.append(body_idx)
+            except KeyError:
+                # Skip bodies that don't exist in this model
+                continue
+        
+        return cls(
+            robot_body_names=robot_body_names,
+            robot_body_indices=tuple(robot_body_indices),
+            noise=noise,
+            noise_type=noise_type,
+        )
+    
+    def observe(self, state: ObservationInput, curriculum_level: Array, rng: PRNGKeyArray) -> Array:
+        # Only include robot bodies
+        robot_indices = jnp.array(self.robot_body_indices)
+        cinert = state.physics_state.data.cinert[robot_indices].ravel()
+        return cinert
+
+
+@attrs.define(frozen=True, kw_only=True)
+class RobotCenterOfMassVelocityObservation(Observation):
+    """Robot-centric center of mass velocity observation that only includes robot bodies."""
+    
+    robot_body_names: tuple[str, ...] = attrs.field(
+        default=(
+            "torso", "head", "waist_lower", "pelvis",
+            "thigh_right", "shin_right", "foot_right",
+            "thigh_left", "shin_left", "foot_left", 
+            "upper_arm_right", "lower_arm_right", "hand_right",
+            "upper_arm_left", "lower_arm_left", "hand_left"
+        )
+    )
+    robot_body_indices: tuple[int, ...] = attrs.field(default=())
+    
+    @classmethod
+    def create(
+        cls,
+        *,
+        physics_model: PhysicsModel,
+        robot_body_names: tuple[str, ...] | None = None,
+        noise: float = 0.0,
+        noise_type: NoiseType = "gaussian",
+    ) -> Self:
+        """Create a robot-centric center of mass velocity observation."""
+        if robot_body_names is None:
+            robot_body_names = (
+                "torso", "head", "waist_lower", "pelvis",
+                "thigh_right", "shin_right", "foot_right",
+                "thigh_left", "shin_left", "foot_left", 
+                "upper_arm_right", "lower_arm_right", "hand_right",
+                "upper_arm_left", "lower_arm_left", "hand_left"
+            )
+        
+        # Get body indices for the robot bodies
+        robot_body_indices = []
+        for body_name in robot_body_names:
+            try:
+                body_idx = get_body_data_idx_from_name(physics_model, body_name)
+                robot_body_indices.append(body_idx)
+            except KeyError:
+                # Skip bodies that don't exist in this model
+                continue
+        
+        return cls(
+            robot_body_names=robot_body_names,
+            robot_body_indices=tuple(robot_body_indices),
+            noise=noise,
+            noise_type=noise_type,
+        )
+    
+    def observe(self, state: ObservationInput, curriculum_level: Array, rng: PRNGKeyArray) -> Array:
+        # Only include robot bodies
+        robot_indices = jnp.array(self.robot_body_indices)
+        cvel = state.physics_state.data.cvel[robot_indices].ravel()
         return cvel
 
 

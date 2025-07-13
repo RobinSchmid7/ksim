@@ -65,11 +65,10 @@ class Actor(eqx.Module):
         depth: int,
         num_mixtures: int,
     ) -> None:
-        num_inputs = NUM_INPUTS
         num_outputs = NUM_JOINTS
 
         self.mlp = eqx.nn.MLP(
-            in_size=num_inputs,
+            in_size=NUM_INPUTS,
             out_size=num_outputs * 3 * num_mixtures,
             width_size=hidden_size,
             depth=depth,
@@ -112,11 +111,10 @@ class Critic(eqx.Module):
         hidden_size: int,
         depth: int,
     ) -> None:
-        num_inputs = NUM_INPUTS
         num_outputs = 1
 
         self.mlp = eqx.nn.MLP(
-            in_size=num_inputs,
+            in_size=NUM_INPUTS,
             out_size=num_outputs,
             width_size=hidden_size,
             depth=depth,
@@ -292,8 +290,8 @@ class HumanoidWalkingTask(ksim.PPOTask[Config], Generic[Config]):
             ksim.JointPositionObservation(),
             ksim.JointVelocityObservation(),
             ksim.ActuatorForceObservation(),
-            ksim.CenterOfMassInertiaObservation(),
-            ksim.CenterOfMassVelocityObservation(),
+            ksim.RobotCenterOfMassInertiaObservation.create(physics_model=physics_model),
+            ksim.RobotCenterOfMassVelocityObservation.create(physics_model=physics_model),
             ksim.BasePositionObservation(),
             ksim.BaseOrientationObservation(),
             ksim.BaseLinearVelocityObservation(),
@@ -391,8 +389,8 @@ class HumanoidWalkingTask(ksim.PPOTask[Config], Generic[Config]):
         timestep_1 = observations["timestep_observation"]
         dh_joint_pos_j = observations["joint_position_observation"]
         dh_joint_vel_j = observations["joint_velocity_observation"]
-        com_inertia_n = observations["center_of_mass_inertia_observation"]
-        com_vel_n = observations["center_of_mass_velocity_observation"]
+        com_inertia_n = observations["robot_center_of_mass_inertia_observation"]
+        com_vel_n = observations["robot_center_of_mass_velocity_observation"]
         # imu_acc_3 = observations["sensor_observation_imu_acc"]
         # imu_gyro_3 = observations["sensor_observation_imu_gyro"]
         proj_grav_3 = observations["projected_gravity_observation"]
@@ -432,8 +430,8 @@ class HumanoidWalkingTask(ksim.PPOTask[Config], Generic[Config]):
         timestep_1 = observations["timestep_observation"]
         dh_joint_pos_j = observations["joint_position_observation"]
         dh_joint_vel_j = observations["joint_velocity_observation"]
-        com_inertia_n = observations["center_of_mass_inertia_observation"]
-        com_vel_n = observations["center_of_mass_velocity_observation"]
+        com_inertia_n = observations["robot_center_of_mass_inertia_observation"]
+        com_vel_n = observations["robot_center_of_mass_velocity_observation"]
         # imu_acc_3 = observations["sensor_observation_imu_acc"]
         # imu_gyro_3 = observations["sensor_observation_imu_gyro"]
         proj_grav_3 = observations["projected_gravity_observation"]
